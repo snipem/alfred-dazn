@@ -1,10 +1,13 @@
 package main
 
+// run: make
 // run: alfred_workflow_data=workflow alfred_workflow_cache=/tmp/alfred alfred_workflow_bundleid=mk_testing go run alfred-dazn.go
 
 import (
 	aw "github.com/deanishe/awgo"
 	"github.com/gocolly/colly"
+	"strconv"
+	"time"
 )
 
 // aw.Workflow is the main API
@@ -30,14 +33,19 @@ func getDAZNSchedule() {
 		dataID := e.Attr("data-id")
 		fixture := e.ChildText(".t")
 		competition := e.ChildText(".dz")
-		time := e.ChildText(".time")
+		dateTime, _ := strconv.ParseInt(e.Attr("data-date"), 10, 64)
+		startTime := time.Unix(dateTime/1000, 0)
 		url := "https://www.dazn.com/de-DE/home/" + dataID
 
-		wf.NewItem(fixture + " (" + competition + ") " + time).
-			Valid(true).
-			Arg(url).
-			Quicklook(url).
-			UID(dataID)
+		isLive := e.DOM.Find(".live").Length() > 0
+
+		if isLive {
+			wf.NewItem(fixture + " (" + competition + ")").
+				Subtitle(startTime.String()).
+				Arg(url).
+				Quicklook(url).
+				UID(dataID)
+		}
 	})
 
 	c.Visit("http://www.spox.com/daznpic/daznprogram.html?c=spoxschedule")
