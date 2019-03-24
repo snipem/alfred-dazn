@@ -31,6 +31,7 @@ func getDAZNSchedule() {
 	c.OnHTML("div.formatdate", func(e *colly.HTMLElement) {
 
 		dataID := e.Attr("data-id")
+		match := e.Attr("data-search")
 		fixture := e.ChildText(".t")
 		competition := e.ChildText(".dz")
 		dateTime, _ := strconv.ParseInt(e.Attr("data-date"), 10, 64)
@@ -42,6 +43,7 @@ func getDAZNSchedule() {
 		if isLive {
 			wf.NewItem(fixture + " (" + competition + ")").
 				Subtitle(startTime.String()).
+				Match(match).
 				Valid(true).
 				Arg(url).
 				Quicklook(url).
