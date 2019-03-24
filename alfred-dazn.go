@@ -42,6 +42,7 @@ func getDAZNSchedule() {
 		if isLive {
 			wf.NewItem(fixture + " (" + competition + ")").
 				Subtitle(startTime.String()).
+				Valid(true).
 				Arg(url).
 				Quicklook(url).
 				UID(dataID)
